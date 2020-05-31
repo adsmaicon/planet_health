@@ -8,15 +8,33 @@ def city(n):
     location = geolocator.geocode(n)
     
     if location is None:
-        return ["", ""]
+        return ["", "", ""]
 
     lt = location.latitude if location.latitude is not None else '' if location is not None else ''
     lo = location.longitude if location.longitude is not None else '' if location is not None else ''
     return [n, lt, lo]
 
+def latitude(n):
+    geolocator = Nominatim(user_agent="Planet Health")
+    location = geolocator.geocode(n)
+    
+    if location is None:
+        return None
 
-df_voos = pd.read_csv("VRA_102019.csv", delimiter=";", usecols=['sg_icao_origem', 'sg_icao_destino', 'dt_partida_real'])
-df_aeroportos = pd.read_csv("aeroportos.csv", delimiter=";")
+    return float(location.latitude) if location.latitude is not None else None if location is not None else None
+
+def longitude(n):
+    geolocator = Nominatim(user_agent="Planet Health")
+    location = geolocator.geocode(n)
+    
+    if location is None:
+        return None
+
+    return float(location.longitude) if location.longitude is not None else None if location is not None else None
+
+
+df_voos = pd.read_csv("files/VRA_102019.csv", delimiter=";", usecols=['sg_icao_origem', 'sg_icao_destino', 'dt_partida_real'])
+df_aeroportos = pd.read_csv("files/aeroportos.csv", delimiter=";")
 df_voos = df_voos.rename(columns={"sg_icao_origem":"sg_origem", "sg_icao_destino":"sg_destino", "dt_partida_real":"data"})
 
 df_origen = df_aeroportos.rename(columns={"Sigla OACI":"sg_origem", "Descrição":"desc", "Cidade":"cidade_origem", "UF":"uf", "País":"pais_origem", "Continente":"continente"})
@@ -33,7 +51,9 @@ result['data'] = result['data'].str[:10]
 voos_dia = pd.DataFrame({'voos' : result.groupby(["cidade_origem", "cidade_destino", "data"]).size()}).reset_index()
 voos_dia = voos_dia.sort_values(by=['data']).reset_index()
 
-geolocator = Nominatim(user_agent="Planet Health")
-vo = pd.DataFrame(data=voos_dia['cidade_destino'].unique())
-ivo = vo[0].map(lambda x: city(x))
-ivo
+
+teste = pd.DataFrame({'latitude' : voos_dia.cidade_destino.map(latitude)})
+# geolocator = Nominatim(user_agent="Planet Health")
+# vo = pd.DataFrame(data=voos_dia['cidade_destino'].unique())
+# ivo = vo.head().applymap(city)
+# ivo

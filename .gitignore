@@ -1,2 +1,9 @@
 .venv/
 .vscode/
+# Elastic Beanstalk Files
+.elasticbeanstalk/
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
+virt/
+.ebignore
+__pycache__/
